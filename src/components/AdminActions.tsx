@@ -26,6 +26,12 @@ export default function AdminActions({ type, id, active }: { type: string; id?: 
   if (type === "deleteThread") {
     return <Button size="sm" variant="danger" disabled={loading} onClick={() => { if (confirm("Delete thread?")) call("deleteThread", { threadId: id }); }}>Delete</Button>;
   }
+  if (type === "deleteComment") {
+    return <Button size="sm" variant="danger" disabled={loading} onClick={() => { if (confirm("Delete comment?")) call("deleteComment", { commentId: id }); }}>Delete</Button>;
+  }
+  if (type === "deleteUser") {
+    return <Button size="sm" variant="danger" disabled={loading} onClick={() => { if (confirm("Delete user and their content?")) call("deleteUser", { userId: id }); }}>Delete User</Button>;
+  }
   if (type === "resolve") {
     return <Button size="sm" variant="secondary" disabled={loading} onClick={() => call("resolveReport", { reportId: id })}>Resolve</Button>;
   }

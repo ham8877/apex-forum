@@ -10,6 +10,7 @@ import { timeAgo } from "@/lib/utils";
 import LikeButton from "@/components/LikeButton";
 import BookmarkButton from "@/components/BookmarkButton";
 import ReportButton from "@/components/ReportButton";
+import AdminActions from "@/components/AdminActions";
 import CommentForm from "@/components/CommentForm";
 import { Eye, Trash2, Lock } from "lucide-react";
 import { notFound } from "next/navigation";
@@ -67,8 +68,9 @@ export default async function ThreadPage({ params }: { params: Promise<{ id: str
                         <span className="text-muted text-xs">{timeAgo(c.createdAt)}</span>
                       </div>
                       <p className="text-sm text-foreground/90 mt-1 whitespace-pre-wrap">{c.content}</p>
-                      <div className="mt-2">
+                      <div className="mt-2 flex items-center gap-2">
                         <LikeButton target="comment" id={c.id} initialLikes={c.likes} initialDislikes={c.dislikes} userId={user?.id ?? null} />
+                        {user?.role === "admin" && <AdminActions type="deleteComment" id={c.id} />}
                       </div>
                     </div>
                   </div>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { banUser, suspendUser, deleteThread, resolveReport, getCategories } from "@/lib/data";
+import { banUser, suspendUser, deleteThread, deleteComment, deleteUser, resolveReport, getCategories } from "@/lib/data";
 // category creation helper
 import { getStore } from "@/lib/data";
 
@@ -13,6 +13,8 @@ export async function POST(req: Request) {
     case "ban": banUser(body.userId, body.banned); break;
     case "suspend": suspendUser(body.userId, body.suspended); break;
     case "deleteThread": deleteThread(body.threadId); break;
+    case "deleteComment": deleteComment(body.commentId); break;
+    case "deleteUser": deleteUser(body.userId); break;
     case "resolveReport": resolveReport(body.reportId); break;
     case "deleteCategory": {
       const store = getStore();

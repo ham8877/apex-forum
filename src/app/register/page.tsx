@@ -12,13 +12,14 @@ export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [reason, setReason] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(""); setLoading(true);
-    const res = await fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, email, password }) });
+    const res = await fetch("/api/auth/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, email, password, reason }) });
     const data = await res.json();
     setLoading(false);
     if (!res.ok) { setError(data.error || "Registration failed"); return; }
@@ -44,6 +45,18 @@ export default function RegisterPage() {
             <div>
               <label className="text-xs text-muted mb-1 block">Password</label>
               <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="min 6 chars" required />
+            </div>
+            <div>
+              <label className="text-xs text-muted mb-1 block">Why are you creating this account? (required)</label>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Tell us why you're joining Apex Forum..."
+                required
+                minLength={10}
+                rows={3}
+                className="w-full bg-card border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent/30 transition-colors resize-y"
+              />
             </div>
             {error && <p className="text-red-400 text-sm">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>{loading ? "Creating..." : "Sign up"}</Button>

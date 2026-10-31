@@ -11,6 +11,7 @@ export type User = {
   password: string;
   avatar: string;
   bio: string;
+  reason?: string;
   joinDate: string;
   reputation: number;
   postCount: number;
@@ -124,7 +125,7 @@ function createSeed(): Store {
   const users: User[] = [
     {
       id: "u1", username: "ApexAdmin", email: "admin@apex.gg", password: "admin123",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ApexAdmin",
+      avatar: "",
       bio: "Founder of Apex Forum. Building the ultimate self-improvement community.",
       joinDate: days(400), reputation: 9850, postCount: 312, role: "admin",
       banned: false, suspended: false, badges: [badges[0], badges[2]],
@@ -132,7 +133,7 @@ function createSeed(): Store {
     },
     {
       id: "u2", username: "IronWill", email: "ironwill@ascend.gg", password: "password",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=IronWill",
+      avatar: "",
       bio: "Lifting since 2018. Natty or not, just consistent.",
       joinDate: days(280), reputation: 4210, postCount: 156, role: "moderator",
       banned: false, suspended: false, badges: [badges[1]],
@@ -140,7 +141,7 @@ function createSeed(): Store {
     },
     {
       id: "u3", username: "StyleSage", email: "style@ascend.gg", password: "password",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=StyleSage",
+      avatar: "",
       bio: "Men's fashion consultant. Fit is king.",
       joinDate: days(200), reputation: 3180, postCount: 98, role: "user",
       banned: false, suspended: false, badges: [badges[2]],
@@ -148,7 +149,7 @@ function createSeed(): Store {
     },
     {
       id: "u4", username: "GlowUp", email: "glow@ascend.gg", password: "password",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=GlowUp",
+      avatar: "",
       bio: "Skincare nerd. Retinol changed my life.",
       joinDate: days(150), reputation: 2450, postCount: 74, role: "user",
       banned: false, suspended: false, badges: [],
@@ -156,7 +157,7 @@ function createSeed(): Store {
     },
     {
       id: "u5", username: "HairlineHero", email: "hair@ascend.gg", password: "password",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=HairlineHero",
+      avatar: "",
       bio: "Hair loss is not a death sentence.",
       joinDate: days(120), reputation: 1890, postCount: 61, role: "user",
       banned: false, suspended: false, badges: [],
@@ -164,7 +165,7 @@ function createSeed(): Store {
     },
     {
       id: "u6", username: "MindsetMax", email: "mind@ascend.gg", password: "password",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=MindsetMax",
+      avatar: "",
       bio: "Discipline > motivation.",
       joinDate: days(90), reputation: 1560, postCount: 45, role: "user",
       banned: false, suspended: false, badges: [],
@@ -259,6 +260,7 @@ export function getThreads(opts?: { categoryId?: string; sort?: string; q?: stri
 
 export function getThreadById(id: string) { return store.threads.find(t => t.id === id); }
 export function getCommentsByThread(threadId: string) { return store.comments.filter(c => c.threadId === threadId).sort((a,b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()); }
+export function getAllComments() { return [...store.comments].sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()); }
 
 export function getPolls() { return store.polls; }
 export function getPollById(id: string) { return store.polls.find(p => p.id === id); }
@@ -270,11 +272,11 @@ export function getNotificationsFor(userId: string) { return store.notifications
 // ---------- Mutations ----------
 function uid(prefix = "id") { return prefix + Math.random().toString(36).slice(2, 10); }
 
-export function createUser(data: { username: string; email: string; password: string }): User {
+export function createUser(data: { username: string; email: string; password: string; reason?: string }): User {
   const user: User = {
     id: uid("u"), username: data.username, email: data.email, password: data.password,
-    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.username)}`,
-    bio: "", joinDate: new Date().toISOString(), reputation: 0, postCount: 0, role: "user",
+    avatar: "",
+    bio: "", reason: data.reason || "", joinDate: new Date().toISOString(), reputation: 0, postCount: 0, role: "user",
     banned: false, suspended: false, badges: [], followers: [], following: [], bookmarks: [], notifications: 0,
   };
   store.users.push(user);
@@ -358,6 +360,13 @@ export function deleteComment(id: string) {
 
 export function banUser(id: string, banned: boolean) { const u = getUserById(id); if (u) u.banned = banned; }
 export function suspendUser(id: string, suspended: boolean) { const u = getUserById(id); if (u) u.suspended = suspended; }
+export function deleteUser(id: string) {
+  const idx = store.users.findIndex(u => u.id === id);
+  if (idx >= 0) store.users.splice(idx, 1);
+  // remove their content
+  store.threads = store.threads.filter(t => t.authorId !== id);
+  store.comments = store.comments.filter(c => c.authorId !== id);
+}
 
 export function toggleBookmark(userId: string, threadId: string) {
   const u = getUserById(userId); if (!u) return;

@@ -4,7 +4,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import Avatar from "@/components/ui/Avatar";
-import { getUsers, getThreads, getReports, getCategories } from "@/lib/data";
+import { getUsers, getThreads, getReports, getCategories, getAllComments } from "@/lib/data";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { Shield, Users, MessageSquare, AlertTriangle, FolderPlus } from "lucide-react";
@@ -15,6 +15,7 @@ export default async function AdminPage() {
   if (!user || user.role !== "admin") redirect("/");
   const users = getUsers();
   const threads = getThreads();
+  const comments = getAllComments();
   const reports = getReports();
   const categories = getCategories();
   return (
@@ -62,9 +63,10 @@ export default async function AdminPage() {
                   </div>
                 </div>
                 {u.role !== "admin" && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <AdminActions type="ban" id={u.id} active={u.banned} />
                     <AdminActions type="suspend" id={u.id} active={u.suspended} />
+                    <AdminActions type="deleteUser" id={u.id} />
                   </div>
                 )}
               </div>
@@ -85,6 +87,23 @@ export default async function AdminPage() {
                 <AdminActions type="deleteThread" id={t.id} />
               </div>
             ))}
+          </div>
+        </Card>
+
+        {/* Comments */}
+        <Card>
+          <h2 className="font-semibold mb-3 flex items-center gap-2"><MessageSquare className="w-4 h-4 text-accent" /> Manage Comments</h2>
+          <div className="space-y-2">
+            {comments.slice(0, 20).map((c) => (
+              <div key={c.id} className="flex items-center justify-between p-2 rounded-lg border border-border gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm truncate">{c.content}</div>
+                  <div className="text-xs text-muted">{c.authorId} · {c.threadId}</div>
+                </div>
+                <AdminActions type="deleteComment" id={c.id} />
+              </div>
+            ))}
+            {comments.length === 0 && <p className="text-muted text-sm">No comments.</p>}
           </div>
         </Card>
 

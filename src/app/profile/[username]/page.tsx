@@ -34,6 +34,7 @@ export default async function ProfilePage({ params }: { params: Promise<{ userna
                 {user.badges.map((b) => <Badge key={b.id} color={b.color}>{b.name}</Badge>)}
               </div>
               <p className="text-muted text-sm mt-1">{user.bio || "No bio yet."}</p>
+              {user.reason && <p className="text-xs text-muted mt-2 italic">Reason for joining: {user.reason}</p>}
               <div className="flex items-center gap-4 mt-3 text-xs text-muted flex-wrap">
                 <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" /> Joined {timeAgo(user.joinDate)}</span>
                 <span className="flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" /> {user.postCount} posts</span>
